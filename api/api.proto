@@ -5,7 +5,7 @@ import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 
 package api;
 
-option go_package = "https://github.com/Msik/h-microservice/api;api";
+option go_package = "github.com/Msik/h-microservice/pkg/api;api";
 
 message StatisticV1Request {
     string period = 1;
