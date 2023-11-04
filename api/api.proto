@@ -7,6 +7,50 @@ package api;
 
 option go_package = "github.com/Msik/h-microservice/pkg/api;api";
 
+service Api {
+    rpc StatV1(StatisticV1Request) returns (StatisticV1Response) {
+        option (google.api.http) = {
+            get: "/v1/stat"
+        };
+    }
+
+    rpc AddCategoryV1(AddCategoryV1Request) returns (AddCategoryV1Response) {
+        option (google.api.http) = {
+            post: "/v1/category"
+        };
+    }
+
+    rpc CategoryListV1(CategoryListV1Request) returns (CategoryListV1Response) {
+        option (google.api.http) = {
+            get: "/v1/category"
+        };
+    }
+
+    rpc DeleteCategoryV1(DeleteCategoryV1Request) returns (DeleteCategoryV1Response) {
+        option (google.api.http) = {
+            delete: "/v1/category"
+        };
+    }
+
+    rpc WasteListV1(WasteListV1Request) returns (WasteListV1Response) {
+        option (google.api.http) = {
+            get: "/v1/waste"
+        };
+    }
+
+    rpc AddWasteListV1(AddWasteListV1Request) returns (AddWasteListV1Response) {
+        option (google.api.http) = {
+            post: "/v1/waste"
+        };
+    }
+
+    rpc DeleteWasteListV1(DeleteWasteListV1Request) returns (DeleteWasteListV1Response) {
+        option (google.api.http) = {
+            delete: "/v1/waste"
+        };
+    }
+}
+
 message StatisticV1Request {
     string period = 1;
 }
@@ -74,48 +118,4 @@ message DeleteWasteListV1Request {
 
 message DeleteWasteListV1Response {
     bool success = 1;
-}
-
-service Api {
-    rpc StatV1(StatisticV1Request) returns (StatisticV1Response) {
-        option (google.api.http) = {
-            get: "/v1/stat"
-        };
-    }
-
-    rpc AddCategoryV1(AddCategoryV1Request) returns (AddCategoryV1Response) {
-        option (google.api.http) = {
-            post: "/v1/category"
-        };
-    }
-
-    rpc CategoryListV1(CategoryListV1Request) returns (CategoryListV1Response) {
-        option (google.api.http) = {
-            get: "/v1/category"
-        };
-    }
-
-    rpc DeleteCategoryV1(DeleteCategoryV1Request) returns (DeleteCategoryV1Response) {
-        option (google.api.http) = {
-            delete: "/v1/category"
-        };
-    }
-
-    rpc WasteListV1(WasteListV1Request) returns (WasteListV1Response) {
-        option (google.api.http) = {
-            get: "/v1/waste"
-        };
-    }
-
-    rpc AddWasteListV1(AddWasteListV1Request) returns (AddWasteListV1Response) {
-        option (google.api.http) = {
-            post: "/v1/waste"
-        };
-    }
-
-    rpc DeleteWasteListV1(DeleteWasteListV1Request) returns (DeleteWasteListV1Response) {
-        option (google.api.http) = {
-            delete: "/v1/waste"
-        };
-    }
 }
