@@ -25,3 +25,7 @@ generate:
 			--validate_out lang=go:pkg/api \
 			--swagger_out=allow_merge=true,merge_file_name=api:swagger \
 			api/api.proto
+
+PHONY: cpProto
+cpProto:
+	cp api/api.proto vendor.protogen/api
