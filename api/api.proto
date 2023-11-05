@@ -55,7 +55,7 @@ message StatisticV1Request {
     string period = 1;
 }
 
-message Statisticv1Response {
+message StatisticV1Response {
     float wastes = 1;
 }
 

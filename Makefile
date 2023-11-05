@@ -14,6 +14,7 @@ PHONY: .vendor-proto
 		git clone https://github.com/envoyproxy/protoc-gen-validate vendor.protogen/github.com/envoyproxy/protoc-gen-validate ;\
 	fi
 
+PHONY: generate
 generate:
 	protoc -I vendor.protogen \
 			--go_out=pkg/api --go_opt=paths=import \
