@@ -69,3 +69,13 @@ func (a *App) runGRPCServer() error {
 func (a *App) runHTTPServer() error {
 	return a.httpServer.ListenAndServe()
 }
+
+func (a *App) Run() error {
+	err := a.runGRPCServer()
+	if err != nil {
+		return err
+	}
+
+	err = a.runHTTPServer()
+	return err
+}
