@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"net"
 	"net/http"
 
@@ -25,7 +26,24 @@ func getGrpcServer() *grpc.Server {
 }
 
 func getHttpServer() *http.Server {
-	return nil
+	serv := grpc.NewServer()
+	reflection.Reqistr(serv)
+
+	netListener, err := net.Listen("tcp", ":1111")
+
+	gatewayConn, err := grpc.DialContext(
+		context.Background(),
+		netListener.Addr().String(),
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+
+	grpcGwMux := http.NewServeMux()
+
+	return &http.Server{
+		Addr:    "8082",
+		Handler: grpcGwMux,
+	}
 }
 
 func NewApp() (*App, error) {
@@ -46,4 +64,8 @@ func (a *App) runGRPCServer() error {
 	}
 
 	return nil
+}
+
+func (a *App) runHTTPServer() error {
+	return a.httpServer.ListenAndServe()
 }
