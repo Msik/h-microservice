@@ -1,7 +1,6 @@
 package app
 
 import (
-	"context"
 	"net"
 	"net/http"
 
@@ -20,23 +19,23 @@ func getGrpcServer() *grpc.Server {
 		grpc.Creds(insecure.NewCredentials()),
 	)
 
-	reflection.Reqistr(server)
+	reflection.Register(server)
 
 	return server
 }
 
 func getHttpServer() *http.Server {
 	serv := grpc.NewServer()
-	reflection.Reqistr(serv)
+	reflection.Register(serv)
 
-	netListener, err := net.Listen("tcp", ":1111")
+	// netListener, _ := net.Listen("tcp", ":1111")
 
-	gatewayConn, err := grpc.DialContext(
-		context.Background(),
-		netListener.Addr().String(),
-		grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
+	// gatewayConn, _ := grpc.DialContext(
+	// 	context.Background(),
+	// 	netListener.Addr().String(),
+	// 	grpc.WithBlock(),
+	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// )
 
 	grpcGwMux := http.NewServeMux()
 
