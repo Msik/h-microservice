@@ -40,7 +40,7 @@ func getHttpServer() *http.Server {
 	grpcGwMux := http.NewServeMux()
 
 	return &http.Server{
-		Addr:    "8082",
+		Addr:    ":8082",
 		Handler: grpcGwMux,
 	}
 }
@@ -70,11 +70,22 @@ func (a *App) runHTTPServer() error {
 }
 
 func (a *App) Run() error {
-	err := a.runGRPCServer()
-	if err != nil {
-		return err
-	}
+	errChan := make(chan error)
+	defer close(errChan)
 
-	err = a.runHTTPServer()
-	return err
+	go func(errChan chan error) {
+		err := a.runGRPCServer()
+		if err != nil {
+			errChan <- err
+		}
+	}(errChan)
+
+	go func(errChan chan error) {
+		err := a.runHTTPServer()
+		if err != nil {
+			errChan <- err
+		}
+	}(errChan)
+
+	return <-errChan
 }
