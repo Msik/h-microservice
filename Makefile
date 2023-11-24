@@ -1,3 +1,28 @@
+CURDIR=$(shell pwd)
+BINDIR=${CURDIR}/bin
+PACKAGE=github.com/Msik/h-microservice
+
+bindir:
+	mkdir -p ${BINDIR}
+
+build: bindir
+	go build -o ${BINDIR}/app ${PACKAGE}
+
+run:
+	go run ${CURDIR}/cmd/server/main.go
+
+test:
+	go test ./...
+
+up:
+	docker-compose up -d --build
+
+stop:
+	docker-compose stop
+
+rm: stop
+	docker-compose rm -f
+
 PHONY: .vendor-proto
 .vendor-proto:
 	mkdir -p vendor.protogen
@@ -16,6 +41,8 @@ PHONY: .vendor-proto
 
 PHONY: generate
 generate:
+	cp api/api.proto vendor.protogen/api
+
 	protoc -I vendor.protogen \
 			--go_out=pkg/api --go_opt=paths=import \
 			--go-grpc_out=pkg/api --go-grpc_opt=paths=import \
@@ -26,6 +53,6 @@ generate:
 			--swagger_out=allow_merge=true,merge_file_name=api:swagger \
 			api/api.proto
 
-PHONY: cpProto
-cpProto:
-	cp api/api.proto vendor.protogen/api
+			mv pkg/api/github.com/Msik/h-microservice/pkg/api/* pkg/api/
+			rm -rf pkg/api/github.com/gihtub.com
+
