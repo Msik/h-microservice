@@ -10,6 +10,7 @@ import (
 	"github.com/Msik/h-microservice/internal/app/service"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -22,8 +23,8 @@ type App struct {
 
 var (
 	newImpl  = service.NewImplementation()
-	httpPort = "8082"
-	grpcPort = "8080"
+	httpPort = ":8082"
+	grpcPort = ":8080"
 )
 
 func getGrpcServer() *grpc.Server {
@@ -54,14 +55,14 @@ func getHttpServer() (*http.Server, error) {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 
-	grpcGwMux := http.NewServeMux()
-	err = desc.RegisterApiHandlerServer(ctx, grpcGwMux, gatewayConn)
+	grpcGwMux := runtime.NewServeMux()
+	err = desc.RegisterApiHandler(ctx, grpcGwMux, gatewayConn)
 	if err != nil {
 		return nil, err
 	}
 
 	return &http.Server{
-		Addr:    ":8082",
+		Addr:    httpPort,
 		Handler: grpcGwMux,
 	}, nil
 }
