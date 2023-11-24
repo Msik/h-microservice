@@ -1,8 +1,14 @@
 package app
 
 import (
+	"context"
+	"fmt"
 	"net"
 	"net/http"
+	"sync"
+
+	"github.com/Msik/h-microservice/internal/app/service"
+	desc "github.com/Msik/h-microservice/pkg/api"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -14,46 +20,66 @@ type App struct {
 	httpServer *http.Server
 }
 
+var (
+	newImpl  = service.NewImplementation()
+	httpPort = "8082"
+	grpcPort = "8080"
+)
+
 func getGrpcServer() *grpc.Server {
 	server := grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 	)
 
 	reflection.Register(server)
+	desc.RegisterApiServer(server, newImpl)
 
 	return server
 }
 
-func getHttpServer() *http.Server {
+func getHttpServer() (*http.Server, error) {
 	serv := grpc.NewServer()
 	reflection.Register(serv)
 
-	// netListener, _ := net.Listen("tcp", ":1111")
+	netListener, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		return nil, err
+	}
 
-	// gatewayConn, _ := grpc.DialContext(
-	// 	context.Background(),
-	// 	netListener.Addr().String(),
-	// 	grpc.WithBlock(),
-	// 	grpc.WithTransportCredentials(insecure.NewCredentials()),
-	// )
+	ctx := context.Background()
+	gatewayConn, err := grpc.DialContext(
+		ctx,
+		netListener.Addr().String(),
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 
 	grpcGwMux := http.NewServeMux()
+	err = desc.RegisterApiHandlerServer(ctx, grpcGwMux, gatewayConn)
+	if err != nil {
+		return nil, err
+	}
 
 	return &http.Server{
 		Addr:    ":8082",
 		Handler: grpcGwMux,
-	}
+	}, nil
 }
 
 func NewApp() (*App, error) {
+	httpSrv, err := getHttpServer()
+	if err != nil {
+		return nil, err
+	}
+
 	return &App{
 		grpcServer: getGrpcServer(),
-		httpServer: getHttpServer(),
+		httpServer: httpSrv,
 	}, nil
 }
 
 func (a *App) runGRPCServer() error {
-	lis, err := net.Listen("tcp", ":1111")
+	lis, err := net.Listen("tcp", grpcPort)
 	if err != nil {
 		return nil
 	}
@@ -69,23 +95,26 @@ func (a *App) runHTTPServer() error {
 	return a.httpServer.ListenAndServe()
 }
 
-func (a *App) Run() error {
-	errChan := make(chan error)
-	defer close(errChan)
+func (a *App) Run() {
+	var wg sync.WaitGroup
 
-	go func(errChan chan error) {
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		err := a.runGRPCServer()
 		if err != nil {
-			errChan <- err
+			fmt.Println(err)
 		}
-	}(errChan)
+	}()
 
-	go func(errChan chan error) {
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		err := a.runHTTPServer()
 		if err != nil {
-			errChan <- err
+			fmt.Println(err)
 		}
-	}(errChan)
+	}()
 
-	return <-errChan
+	wg.Wait()
 }
