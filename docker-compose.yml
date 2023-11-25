@@ -1,0 +1,8 @@
+version: "3.1"
+services:
+  serv_name:
+    image: api
+    build: ./
+    ports:
+      - "8080:8080" # grpc
+      - "8082:8082" # http
