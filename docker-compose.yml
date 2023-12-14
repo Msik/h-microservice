@@ -6,3 +6,12 @@ services:
     ports:
       - "8080:8080" # grpc
       - "8082:8082" # http
+
+  pgsql:
+    image: 'postgres:15'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: main
+      POSTGRES_PASSWORD: main
+      POSTGRES_DB: main
