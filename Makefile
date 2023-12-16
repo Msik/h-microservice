@@ -5,8 +5,8 @@ PACKAGE=github.com/Msik/h-microservice
 bindir:
 	mkdir -p ${BINDIR}
 
-build: bindir
-	go build -o ${BINDIR}/app ${PACKAGE}
+# build: bindir
+# 	go build -o ${BINDIR}/app ${PACKAGE}
 
 run:
 	go run ${CURDIR}/cmd/server/main.go
@@ -14,8 +14,11 @@ run:
 test:
 	go test ./...
 
+build:
+	docker-compose build
+
 up:
-	docker-compose up -d --build
+	docker-compose up -d
 
 down:
 	docker-compose down
@@ -25,6 +28,12 @@ stop:
 
 rm: stop
 	docker-compose rm -f
+
+migrate:
+	docker-compose exec app goose -dir migrations up
+
+createMigration:
+	docker-compose exec app goose -dir migrations create ${name} sql
 
 PHONY: .vendor-proto
 .vendor-proto:
