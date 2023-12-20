@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/Msik/h-microservice/internal/app/service"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -19,6 +21,7 @@ import (
 type App struct {
 	grpcServer *grpc.Server
 	httpServer *http.Server
+	db         *sqlx.DB
 }
 
 var (
@@ -67,6 +70,14 @@ func getHttpServer() (*http.Server, error) {
 	}, nil
 }
 
+func getDbConnection() (*sqlx.DB, error) {
+	if sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT")); err != nil {
+		return nil, err
+	}
+
+	return sqlxDB
+}
+
 func NewApp() (*App, error) {
 	httpSrv, err := getHttpServer()
 	if err != nil {
@@ -76,6 +87,7 @@ func NewApp() (*App, error) {
 	return &App{
 		grpcServer: getGrpcServer(),
 		httpServer: httpSrv,
+		db:         getDbConnection,
 	}, nil
 }
 
