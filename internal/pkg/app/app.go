@@ -71,11 +71,12 @@ func getHttpServer() (*http.Server, error) {
 }
 
 func getDbConnection() (*sqlx.DB, error) {
-	if sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT")); err != nil {
+	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT"))
+	if err != nil {
 		return nil, err
 	}
 
-	return sqlxDB
+	return sqlxDB, nil
 }
 
 func NewApp() (*App, error) {
@@ -84,10 +85,15 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
+	dbConnection, err := getDbConnection()
+	if err != nil {
+		return nil, err
+	}
+
 	return &App{
 		grpcServer: getGrpcServer(),
 		httpServer: httpSrv,
-		db:         getDbConnection,
+		db:         dbConnection,
 	}, nil
 }
 
