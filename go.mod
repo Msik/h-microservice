@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/envoyproxy/protoc-gen-validate v1.0.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.18.0
+	github.com/jmoiron/sqlx v1.3.5
 	google.golang.org/genproto/googleapis/api v0.0.0-20231030173426-d783a09b4405
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
