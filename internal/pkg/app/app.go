@@ -8,6 +8,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/Msik/h-microservice/internal/app/repository"
 	"github.com/Msik/h-microservice/internal/app/service"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
@@ -21,16 +22,30 @@ import (
 type App struct {
 	grpcServer *grpc.Server
 	httpServer *http.Server
-	db         *sqlx.DB
 }
 
 var (
-	newImpl  = service.NewImplementation()
 	httpPort = ":8082"
 	grpcPort = ":8080"
 )
 
-func getGrpcServer() *grpc.Server {
+func getDbConnection() (*sqlx.DB, error) {
+	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT"))
+	if err != nil {
+		return nil, err
+	}
+
+	return sqlxDB, nil
+}
+
+func getGrpcServer() (*grpc.Server, error) {
+	dbConnection, err := getDbConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	newImpl = service.NewImplementation(repository.NewFactory(dbConnection))
+
 	server := grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 	)
@@ -38,7 +53,7 @@ func getGrpcServer() *grpc.Server {
 	reflection.Register(server)
 	desc.RegisterApiServer(server, newImpl)
 
-	return server
+	return server, nil
 }
 
 func getHttpServer() (*http.Server, error) {
@@ -70,30 +85,20 @@ func getHttpServer() (*http.Server, error) {
 	}, nil
 }
 
-func getDbConnection() (*sqlx.DB, error) {
-	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT"))
-	if err != nil {
-		return nil, err
-	}
-
-	return sqlxDB, nil
-}
-
 func NewApp() (*App, error) {
 	httpSrv, err := getHttpServer()
 	if err != nil {
 		return nil, err
 	}
 
-	dbConnection, err := getDbConnection()
+	grpcServer err := getGrpcServer()
 	if err != nil {
 		return nil, err
 	}
 
 	return &App{
-		grpcServer: getGrpcServer(),
+		grpcServer: grpcServer,
 		httpServer: httpSrv,
-		db:         dbConnection,
 	}, nil
 }
 
