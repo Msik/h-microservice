@@ -10,6 +10,7 @@ import (
 
 	"github.com/Msik/h-microservice/internal/app/repository"
 	"github.com/Msik/h-microservice/internal/app/service"
+	sCategory "github.com/Msik/h-microservice/internal/app/service/category"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -44,7 +45,8 @@ func getGrpcServer() (*grpc.Server, error) {
 		return nil, err
 	}
 
-	newImpl = service.NewImplementation(repository.NewFactory(dbConnection))
+	categoryService := sCategory.New(dbConnection)
+	newImpl = service.NewImplementation(categoryService)
 
 	server := grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
