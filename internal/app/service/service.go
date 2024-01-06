@@ -10,10 +10,10 @@ import (
 
 type Implementation struct {
 	desc.UnimplementedApiServer
-	categoryService category.CategoryServiceInterface
+	categoryService *category.CategoryService
 }
 
-func NewImplementation(categoryService category.CategoryServiceInterface) *Implementation {
+func NewImplementation(categoryService *category.CategoryService) *Implementation {
 	return &Implementation{categoryService: categoryService}
 }
 
