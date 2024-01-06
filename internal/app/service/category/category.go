@@ -16,9 +16,21 @@ type CategoryServiceInterface interface {
 }
 
 type CategoryService struct {
-	categoryRepository repository.CategoryRepository
+	categoryRepository *repository.CategoryRepository
 }
 
 func New(db *sqlx.DB) *CategoryService {
 	return &CategoryService{categoryRepository: repository.NewCategoryRepository(db)}
+}
+
+func (cs *CategoryService) Add(ctx context.Context, title string) (uint64, error) {
+	return 0, nil
+}
+
+func (cs *CategoryService) List(ctx context.Context) ([]model.Category, error) {
+	return []model.Category{}, nil
+}
+
+func (cs *CategoryService) Delete(ctx context.Context, category_id uint64) error {
+	return nil
 }

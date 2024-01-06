@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"github.com/Msik/h-microservice/internal/app/model"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -11,10 +10,6 @@ type CategoryRepository struct {
 
 func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 	return &CategoryRepository{
-		db: db
+		db: db,
 	}
-}
-
-func GetCategory() model.Category {
-
 }
