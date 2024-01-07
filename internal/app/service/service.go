@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"github.com/Msik/h-microservice/internal/app/service/category"
-
 	desc "github.com/Msik/h-microservice/pkg/api"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Implementation struct {
@@ -18,7 +20,22 @@ func NewImplementation(categoryService *category.CategoryService) *Implementatio
 }
 
 func (impl *Implementation) AddCategoryV1(ctx context.Context, req *desc.AddCategoryV1Request) (*desc.AddCategoryV1Response, error) {
-	panic("unimplemented")
+	title := reg.GetTitle()
+	if reg.GetTitle() == "" {
+		return nil, status.Error(codes.InvalidArgument, "title is required")
+	}
+
+	id, err := impl.categoryService.Add(ctx, title)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to store catetory")
+	}
+
+	return &desc.AddCategoryV1Response{
+		Category: &desc.Category{
+			Id: id,
+			Title: title,
+		}
+	}, nil
 }
 
 func (impl *Implementation) CategoryListV1(ctx context.Context, req *desc.CategoryListV1Request) (*desc.CategoryListV1Response, error) {
