@@ -20,12 +20,7 @@ func NewImplementation(categoryService *category.CategoryService) *Implementatio
 }
 
 func (impl *Implementation) AddCategoryV1(ctx context.Context, req *desc.AddCategoryV1Request) (*desc.AddCategoryV1Response, error) {
-	title := reg.GetTitle()
-	if reg.GetTitle() == "" {
-		return nil, status.Error(codes.InvalidArgument, "title is required")
-	}
-
-	id, err := impl.categoryService.Add(ctx, title)
+	id, err := impl.categoryService.Add(ctx, reg.GetTitle())
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to store catetory")
 	}
@@ -43,10 +38,6 @@ func (impl *Implementation) CategoryListV1(ctx context.Context, req *desc.Catego
 }
 
 func (impl *Implementation) DeleteCategoryV1(ctx context.Context, req *desc.DeleteCategoryV1Request) (*desc.DeleteCategoryV1Response, error) {
-	if req.GetId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "validation error")
-	}
-
 	err := impl.categoryService.Delete(ctx, req.GetId())
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to delete catetory")
