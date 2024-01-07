@@ -18,7 +18,12 @@ func New(db *sqlx.DB) *CategoryService {
 }
 
 func (cs *CategoryService) Add(ctx context.Context, title string) (uint64, error) {
-	return 0, nil
+	id, err := cs.categoryRepository.Store(ctx, title)
+	if err != nil {
+		return 0, err
+	}
+
+	return id, nil
 }
 
 func (cs *CategoryService) List(ctx context.Context) ([]model.Category, error) {
