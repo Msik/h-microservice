@@ -38,3 +38,17 @@ func (cr *CategoryRepository) Store(ctx context.Context, title string) (uint64, 
 
 	return id, nil
 }
+
+func (cr *CategoryRepository) Delete(ctx context.Context, id uint64) error {
+	query := sq.Delete(catergoryTable).
+		Where(sq.Eq{"id": id}).
+		RunWith(cr.db).
+		PlaceholderFormat(sq.Dollar)
+
+	err := query.QueryRowContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

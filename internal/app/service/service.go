@@ -43,5 +43,16 @@ func (impl *Implementation) CategoryListV1(ctx context.Context, req *desc.Catego
 }
 
 func (impl *Implementation) DeleteCategoryV1(ctx context.Context, req *desc.DeleteCategoryV1Request) (*desc.DeleteCategoryV1Response, error) {
-	panic("unimplemented")
+	if req.GetId() == 0 {
+		return nil, status.Error(codes.InvalidArgument, "validation error")
+	}
+
+	err := impl.categoryService.Delete(ctx, req.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to delete catetory")
+	}
+
+	return &desc.DeleteCategoryV1Response{
+		Success: true,
+	}
 }
