@@ -18,6 +18,10 @@ COPY . ./
 # RUN make build
 # RUN make run
 
+RUN curl -fsSL \
+    https://raw.githubusercontent.com/pressly/goose/master/install.sh |\
+    sh
+
 EXPOSE 8080
 EXPOSE 8082
 CMD ["make", "run"]
