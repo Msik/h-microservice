@@ -45,7 +45,8 @@ func (cr *CategoryRepository) Delete(ctx context.Context, id uint64) error {
 		RunWith(cr.db).
 		PlaceholderFormat(sq.Dollar)
 
-	err := query.QueryRowContext(ctx)
+	var found bool
+	err := query.QueryRowContext(ctx).Scan(&found)
 	if err != nil {
 		return err
 	}

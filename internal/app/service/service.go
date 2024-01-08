@@ -14,7 +14,7 @@ import (
 type Implementation struct {
 	desc.UnimplementedApiServer
 	categoryService *category.CategoryService
-	wasteService *waste.WasteService
+	wasteService    *waste.WasteService
 }
 
 func NewImplementation(categoryService *category.CategoryService, wasteService *waste.WasteService) *Implementation {
@@ -22,16 +22,16 @@ func NewImplementation(categoryService *category.CategoryService, wasteService *
 }
 
 func (impl *Implementation) AddCategoryV1(ctx context.Context, req *desc.AddCategoryV1Request) (*desc.AddCategoryV1Response, error) {
-	id, err := impl.categoryService.Add(ctx, reg.GetTitle())
+	id, err := impl.categoryService.Add(ctx, req.GetTitle())
 	if err != nil {
 		return nil, status.Error(codes.Internal, "failed to store catetory")
 	}
 
 	return &desc.AddCategoryV1Response{
 		Category: &desc.Category{
-			Id: id,
-			Title: title,
-		}
+			Id:    id,
+			Title: req.GetTitle(),
+		},
 	}, nil
 }
 
@@ -47,7 +47,7 @@ func (impl *Implementation) DeleteCategoryV1(ctx context.Context, req *desc.Dele
 
 	return &desc.DeleteCategoryV1Response{
 		Success: true,
-	}
+	}, nil
 }
 
 func (impl *Implementation) AddWasteListV1(context.Context, *desc.AddWasteListV1Request) (*desc.AddWasteListV1Response, error) {

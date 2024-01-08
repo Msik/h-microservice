@@ -31,7 +31,7 @@ func (cs *CategoryService) List(ctx context.Context) ([]model.Category, error) {
 }
 
 func (cs *CategoryService) Delete(ctx context.Context, category_id uint64) error {
-	if err := cs.categoryService.Delete(ctx, category_id); err != nil {
+	if err := cs.categoryRepository.Delete(ctx, category_id); err != nil {
 		return err
 	}
 
