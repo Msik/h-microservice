@@ -1052,9 +1052,7 @@ func (m *Waste) validate(all bool) error {
 
 	// no validation rules for Amount
 
-	if m.CategoryId != nil {
-		// no validation rules for CategoryId
-	}
+	// no validation rules for CategoryId
 
 	if len(errors) > 0 {
 		return WasteMultiError(errors)

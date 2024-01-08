@@ -91,7 +91,7 @@ message DeleteCategoryV1Response {
 message Waste {
     uint64 id = 1;
     float amount = 2;
-    optional int64 category_id = 3;
+    uint64 category_id = 3;
 }
 
 message WasteListV1Request {
