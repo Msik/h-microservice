@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Msik/h-microservice/internal/app/service/category"
+	"github.com/Msik/h-microservice/internal/app/service/waste"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
 	"google.golang.org/grpc/codes"
@@ -13,10 +14,11 @@ import (
 type Implementation struct {
 	desc.UnimplementedApiServer
 	categoryService *category.CategoryService
+	wasteService *waste.WasteService
 }
 
-func NewImplementation(categoryService *category.CategoryService) *Implementation {
-	return &Implementation{categoryService: categoryService}
+func NewImplementation(categoryService *category.CategoryService, wasteService *waste.WasteService) *Implementation {
+	return &Implementation{categoryService: categoryService, wasteService: wasteService}
 }
 
 func (impl *Implementation) AddCategoryV1(ctx context.Context, req *desc.AddCategoryV1Request) (*desc.AddCategoryV1Response, error) {
@@ -46,4 +48,12 @@ func (impl *Implementation) DeleteCategoryV1(ctx context.Context, req *desc.Dele
 	return &desc.DeleteCategoryV1Response{
 		Success: true,
 	}
+}
+
+func (impl *Implementation) AddWasteListV1(context.Context, *desc.AddWasteListV1Request) (*desc.AddWasteListV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddWasteListV1 not implemented")
+}
+
+func (impl *Implementation) DeleteWasteListV1(context.Context, *desc.DeleteWasteListV1Request) (*desc.DeleteWasteListV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteWasteListV1 not implemented")
 }
