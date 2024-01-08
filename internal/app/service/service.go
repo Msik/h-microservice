@@ -50,8 +50,21 @@ func (impl *Implementation) DeleteCategoryV1(ctx context.Context, req *desc.Dele
 	}, nil
 }
 
-func (impl *Implementation) AddWasteListV1(context.Context, *desc.AddWasteListV1Request) (*desc.AddWasteListV1Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddWasteListV1 not implemented")
+func (impl *Implementation) AddWasteListV1(ctx context.Context, req *desc.AddWasteListV1Request) (*desc.AddWasteListV1Response, error) {
+	amount, category_id := req.GetAmount(), req.GetCategoryId()
+
+	id, err := impl.wasteService.Add(ctx, amount, category_id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to store waste")
+	}
+
+	return &desc.AddWasteListV1Response{
+		Waste: &desc.Waste{
+			Id:         id,
+			Amount:     amount,
+			CategoryId: category_id,
+		},
+	}, nil
 }
 
 func (impl *Implementation) DeleteWasteListV1(context.Context, *desc.DeleteWasteListV1Request) (*desc.DeleteWasteListV1Response, error) {
