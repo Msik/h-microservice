@@ -37,3 +37,18 @@ func (wr *WasteRepository) Store(ctx context.Context, amount float32, category_i
 
 	return id, nil
 }
+
+func (wr *WasteRepository) Delete(ctx context.Context, id uint64) error {
+	query := sq.Delete(wasteTable).
+		Where(sq.Eq{"id": id}).
+		RunWith(wr.db).
+		PlaceholderFormat(sq.Dollar)
+
+	var found bool
+	err := query.QueryRowContext(ctx).Scan(&found)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

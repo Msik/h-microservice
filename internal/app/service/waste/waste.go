@@ -24,3 +24,11 @@ func (ws *WasteService) Add(ctx context.Context, amount float32, category_id uin
 
 	return id, nil
 }
+
+func (ws *WasteService) Delete(ctx context.Context, waste_id uint64) error {
+	if err := ws.wasteRepository.Delete(ctx, waste_id); err != nil {
+		return err
+	}
+
+	return nil
+}

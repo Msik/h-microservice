@@ -67,6 +67,13 @@ func (impl *Implementation) AddWasteListV1(ctx context.Context, req *desc.AddWas
 	}, nil
 }
 
-func (impl *Implementation) DeleteWasteListV1(context.Context, *desc.DeleteWasteListV1Request) (*desc.DeleteWasteListV1Response, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DeleteWasteListV1 not implemented")
+func (impl *Implementation) DeleteWasteListV1(ctx context.Context, req *desc.DeleteWasteListV1Request) (*desc.DeleteWasteListV1Response, error) {
+	err := impl.wasteService.Delete(ctx, req.GetId())
+	if err != nil {
+		return nil, status.Error(codes.Internal, "failed to delete waste")
+	}
+
+	return &desc.DeleteWasteListV1Response{
+		Success: true,
+	}, nil
 }
