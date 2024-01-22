@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"sync"
 
 	"github.com/Msik/h-microservice/internal/app/service"
+	sCategory "github.com/Msik/h-microservice/internal/app/service/category"
+	sWaste "github.com/Msik/h-microservice/internal/app/service/waste"
 	desc "github.com/Msik/h-microservice/pkg/api"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/jmoiron/sqlx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -22,12 +26,29 @@ type App struct {
 }
 
 var (
-	newImpl  = service.NewImplementation()
 	httpPort = ":8082"
 	grpcPort = ":8080"
 )
 
-func getGrpcServer() *grpc.Server {
+func getDbConnection() (*sqlx.DB, error) {
+	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT"))
+	if err != nil {
+		return nil, err
+	}
+
+	return sqlxDB, nil
+}
+
+func getGrpcServer() (*grpc.Server, error) {
+	dbConnection, err := getDbConnection()
+	if err != nil {
+		return nil, err
+	}
+
+	categoryService := sCategory.New(dbConnection)
+	wasteService := sWaste.New(dbConnection)
+	newImpl := service.NewImplementation(categoryService, wasteService)
+
 	server := grpc.NewServer(
 		grpc.Creds(insecure.NewCredentials()),
 	)
@@ -35,7 +56,7 @@ func getGrpcServer() *grpc.Server {
 	reflection.Register(server)
 	desc.RegisterApiServer(server, newImpl)
 
-	return server
+	return server, nil
 }
 
 func getHttpServer() (*http.Server, error) {
@@ -73,8 +94,13 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
+	grpcServer, err := getGrpcServer()
+	if err != nil {
+		return nil, err
+	}
+
 	return &App{
-		grpcServer: getGrpcServer(),
+		grpcServer: grpcServer,
 		httpServer: httpSrv,
 	}, nil
 }
