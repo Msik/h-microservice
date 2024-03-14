@@ -15,6 +15,7 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -31,7 +32,7 @@ var (
 )
 
 func getDbConnection() (*sqlx.DB, error) {
-	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_CONNECT"))
+	sqlxDB, err := sqlx.Connect("postgres", os.Getenv("DB_SQLX_CONNECT"))
 	if err != nil {
 		return nil, err
 	}
